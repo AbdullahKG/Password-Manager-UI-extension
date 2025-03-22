@@ -1,0 +1,51 @@
+.password-manager-popup {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    padding: 8px 0;
+    font-size: 14px;
+    width: 260px; /* Fixed width for consistency */
+}
+
+.popup-option-container {
+    padding: 10px;
+    margin: 3px 10px;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.dropdown-container {
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.popup-site-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.popup-option {
+    padding: 8px 14px;
+    cursor: pointer;
+    color: #333;
+    font-weight: bold;
+    transition: background 0.2s, transform 0.1s;
+    width: 100%;
+}
+
+.popup-option:hover {
+    background: #e0e0e0;
+    transform: scale(1.02);
+}

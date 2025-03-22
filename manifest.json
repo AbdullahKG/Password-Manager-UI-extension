@@ -1,0 +1,37 @@
+{
+    "manifest_version": 2,
+    "name": "Self-Hosted Password Manager",
+    "version": "1.0",
+    "description": "A self-hosted password manager extension.",
+    "icons": {
+        "48": "./images/shield.png",
+        "128": "./images/shield.png"
+    },
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting",
+        "webRequest",
+        "webRequestBlocking",
+        "http://localhost:3000/*"
+    ],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "browser_action": {
+        "default_popup": "./login.html",
+        "default_icon": "./shield.png"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": [
+                "./dist/LoginContent.bundle.js",
+                "./dist/SignUpContent.bundle.js"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "optional_permissions": ["http://*/*", "https://*/*"]
+}

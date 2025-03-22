@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Password Manager</title>
+        <link rel="stylesheet" href="vault.css" />
+        <script type="module" defer src="vault.js"></script>
+        <script type="module" defer src="randomPassword.js"></script>
+        <script type="module" defer src="CheckPassword.js"></script>
+    </head>
+    <body>
+        <nav class="navbar">
+            <a href="#" data-page="passwords">Saved Passwords</a>
+            <a href="#" data-page="generate">Generate Password</a>
+            <a href="#" data-page="check">Check Password</a>
+        </nav>
+
+        <div id="passwords" class="page">
+            <div class="password-manager">
+                <h2>Saved Passwords</h2>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search by site name..."
+                />
+                <div id="passwordList" class="password-list"></div>
+            </div>
+        </div>
+
+        <div id="generate" class="page" style="display: none">
+            <div class="password-manager">
+                <h2>Generate Password</h2>
+                <input type="text" id="generatedPassword" readonly />
+                <button id="generateBtn">Generate</button>
+            </div>
+        </div>
+
+        <div id="check" class="page" style="display: none">
+            <div class="password-manager">
+                <h2>Check Password</h2>
+                <input
+                    type="password"
+                    id="passwordInput"
+                    placeholder="Enter password..."
+                />
+                <button id="checkBtn">Check</button>
+                <p id="checkResult"></p>
+            </div>
+        </div>
+    </body>
+</html>
