@@ -4,7 +4,7 @@ const FIXED_SALT = new Uint8Array([
 
 // Convert Uint8Array to Base64
 function uint8ArrayToBase64(uint8Array) {
-    return btoa(String.fromCharCode.apply(null, uint8Array));
+    return btoa(String.fromCharCode(...uint8Array));
 }
 
 // Convert Base64 to Uint8Array
@@ -16,87 +16,113 @@ function base64ToUint8Array(base64String) {
     );
 }
 
-// Key Derivation Function
-const deriveKey = async (password) => {
-    const encoder = new TextEncoder();
-    const keyMaterial = await window.crypto.subtle.importKey(
-        "raw",
-        encoder.encode(password),
-        { name: "PBKDF2" },
-        false,
-        ["deriveKey"]
-    );
+// Key Derivation Function using PBKDF2
+async function deriveKey(password) {
+    if (!password) {
+        throw new Error("Password cannot be empty.");
+    }
 
-    return window.crypto.subtle.deriveKey(
-        {
-            name: "PBKDF2",
-            salt: FIXED_SALT,
-            iterations: 100000,
-            hash: "SHA-256",
-        },
-        keyMaterial,
-        { name: "AES-GCM", length: 256 },
-        false,
-        ["encrypt", "decrypt"]
-    );
-};
+    try {
+        const encoder = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey(
+            "raw",
+            encoder.encode(password),
+            { name: "PBKDF2" },
+            false,
+            ["deriveKey"]
+        );
+
+        return await crypto.subtle.deriveKey(
+            {
+                name: "PBKDF2",
+                salt: FIXED_SALT,
+                iterations: 100000,
+                hash: "SHA-256",
+            },
+            keyMaterial,
+            { name: "AES-GCM", length: 256 },
+            false,
+            ["encrypt", "decrypt"]
+        );
+    } catch (error) {
+        console.error("Key derivation failed:", error);
+        throw new Error("Key derivation error.");
+    }
+}
 
 // Encrypt Function
 export async function encryptData(master, text) {
-    const key = await deriveKey(master);
-    const iv = window.crypto.getRandomValues(new Uint8Array(12)); // Generate IV
+    if (!master || !text) {
+        throw new Error("Master password and text cannot be empty.");
+    }
 
-    const encrypted = await window.crypto.subtle.encrypt(
-        { name: "AES-GCM", iv },
-        key,
-        new TextEncoder().encode(text)
-    );
+    try {
+        const key = await deriveKey(master);
+        const iv = crypto.getRandomValues(new Uint8Array(12)); // Generate IV
 
-    const encryptedBytes = new Uint8Array(iv.length + encrypted.byteLength);
-    encryptedBytes.set(iv, 0);
-    encryptedBytes.set(new Uint8Array(encrypted), iv.length);
+        const encrypted = await crypto.subtle.encrypt(
+            { name: "AES-GCM", iv, tagLength: 128 },
+            key,
+            new TextEncoder().encode(text)
+        );
 
-    const base64Encrypted = uint8ArrayToBase64(encryptedBytes);
+        const encryptedBytes = new Uint8Array(iv.length + encrypted.byteLength);
+        encryptedBytes.set(iv, 0);
+        encryptedBytes.set(new Uint8Array(encrypted), iv.length);
 
-    return base64Encrypted;
+        return uint8ArrayToBase64(encryptedBytes);
+    } catch (error) {
+        console.error("Encryption failed:", error);
+        throw new Error("Encryption error.");
+    }
 }
 
 // Decrypt Function
 export async function decryptData(master, encryptedBase64) {
-    const key = await deriveKey(master);
-
-    // Convert Base64 to Uint8Array
-    const encryptedBytes = base64ToUint8Array(encryptedBase64);
-
-    // Extract IV
-    const iv = encryptedBytes.slice(0, 12);
-    const encryptedData = encryptedBytes.slice(12);
+    if (!master || !encryptedBase64) {
+        throw new Error("Master password and encrypted data cannot be empty.");
+    }
 
     try {
-        const decrypted = await window.crypto.subtle.decrypt(
-            { name: "AES-GCM", iv },
+        const key = await deriveKey(master);
+        const encryptedBytes = base64ToUint8Array(encryptedBase64);
+
+        if (encryptedBytes.length < 13) {
+            throw new Error("Invalid encrypted data.");
+        }
+
+        const iv = encryptedBytes.slice(0, 12);
+        const encryptedData = encryptedBytes.slice(12);
+
+        const decrypted = await crypto.subtle.decrypt(
+            { name: "AES-GCM", iv, tagLength: 128 },
             key,
             encryptedData
         );
 
-        const decryptedText = new TextDecoder().decode(
-            new Uint8Array(decrypted)
-        );
-
-        return decryptedText;
+        return new TextDecoder().decode(new Uint8Array(decrypted));
     } catch (error) {
         console.error("Decryption failed:", error);
         return null;
     }
 }
 
+// SHA-1 Hashing Function
 export async function sha1(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest("SHA-1", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("")
-        .toUpperCase();
+    if (!password) {
+        throw new Error("Password cannot be empty.");
+    }
+
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest("SHA-1", data);
+        return Array.from(new Uint8Array(hashBuffer))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("")
+            .toUpperCase();
+    } catch (error) {
+        console.error("SHA-1 hashing failed:", error);
+        throw new Error("SHA-1 hashing error.");
+    }
 }

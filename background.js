@@ -5,41 +5,87 @@ runtime.runtime.onInstalled.addListener(() => {
 });
 
 runtime.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "fetchData") {
-        fetch(`http://localhost:3000/passwords/${request.site}`, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${request.token}`,
-                "Content-Type": "application/json",
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => sendResponse({ success: true, data }))
-            .catch((error) =>
-                sendResponse({ success: false, error: error.message })
-            );
-        return true;
-    }
-    if (request.action === "saveCredentials") {
-        fetch("http://localhost:3000/passwords", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${request.token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                siteName: request.site,
-                siteEmail: request.email,
-                sitePassword: request.password,
-            }),
-        })
-            .then((response) => response.json())
-            .then((data) =>
-                sendResponse({ success: true, message: "Credentials saved." })
-            )
-            .catch((error) =>
-                sendResponse({ success: false, error: error.message })
-            );
-        return true;
-    }
+    (async () => {
+        try {
+            if (!request.action) {
+                throw new Error("Invalid request: Action is missing.");
+            }
+
+            if (request.action === "fetchData") {
+                if (!request.token || !request.site) {
+                    throw new Error(
+                        "Missing required parameters for fetchData."
+                    );
+                }
+
+                const response = await fetch(
+                    `http://localhost:3000/passwords/${encodeURIComponent(
+                        request.site
+                    )}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${request.token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Server error: ${response.status} ${response.statusText}`
+                    );
+                }
+
+                const data = await response.json();
+                sendResponse({ success: true, data });
+            } else if (request.action === "saveCredentials") {
+                if (
+                    !request.token ||
+                    !request.site ||
+                    !request.email ||
+                    !request.password
+                ) {
+                    throw new Error(
+                        "Missing required parameters for saveCredentials."
+                    );
+                }
+
+                const response = await fetch(
+                    "http://localhost:3000/passwords",
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${request.token}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            siteName: request.site,
+                            siteEmail: request.email,
+                            sitePassword: request.password,
+                        }),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Server error: ${response.status} ${response.statusText}`
+                    );
+                }
+
+                await response.json();
+                sendResponse({
+                    success: true,
+                    message: "Credentials saved successfully.",
+                });
+            } else {
+                throw new Error("Unknown action.");
+            }
+        } catch (error) {
+            console.error("Error handling message:", error);
+            sendResponse({ success: false, error: error.message });
+        }
+    })();
+
+    return true; // Keeps the message channel open for async responses.
 });

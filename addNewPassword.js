@@ -7,20 +7,57 @@ document.addEventListener("DOMContentLoaded", () => {
             : chrome.storage.local;
 
     async function getStoredToken() {
-        return new Promise((resolve) => {
-            storage.get("jwt_token", (result) => resolve(result.jwt_token));
-        });
+        try {
+            return new Promise((resolve, reject) => {
+                storage.get("jwt_token", (result) => {
+                    if (chrome.runtime.lastError) {
+                        console.error(
+                            "Storage error:",
+                            chrome.runtime.lastError
+                        );
+                        reject("Failed to retrieve token.");
+                    } else {
+                        resolve(result.jwt_token || null);
+                    }
+                });
+            });
+        } catch (error) {
+            console.error("Error getting token:", error);
+            return null;
+        }
     }
 
-    function getStoredUserName() {
-        return new Promise((resolve) => {
-            storage.get("username", (result) => resolve(result.username));
-        });
+    async function getStoredUserName() {
+        try {
+            return new Promise((resolve, reject) => {
+                storage.get("username", (result) => {
+                    if (chrome.runtime.lastError) {
+                        console.error(
+                            "Storage error:",
+                            chrome.runtime.lastError
+                        );
+                        reject("Failed to retrieve username.");
+                    } else {
+                        resolve(result.username || "defaultUser");
+                    }
+                });
+            });
+        } catch (error) {
+            console.error("Error getting username:", error);
+            return "defaultUser";
+        }
     }
 
     async function encryptPassword(password) {
-        const userName = await getStoredUserName();
-        return encryptData(userName, password); // Encrypt and return result
+        try {
+            const userName = await getStoredUserName();
+            if (!userName)
+                throw new Error("Username not found for encryption.");
+            return encryptData(userName, password);
+        } catch (error) {
+            console.error("Encryption failed:", error);
+            throw new Error("Password encryption error.");
+        }
     }
 
     document
@@ -33,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document
         .getElementById("createNewBtn")
         .addEventListener("click", async function () {
-            // Make event handler async
             const siteName = document.getElementById("siteName").value.trim();
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value.trim();
@@ -44,22 +80,36 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             try {
-                const encryptedPassword = await encryptPassword(password); // Encrypt the password
-                const token = await getStoredToken(); // Get token
+                const encryptedPassword = await encryptPassword(password);
+                const token = await getStoredToken();
 
-                // Send encrypted password to the background script
+                if (!token) {
+                    alert("Authentication token missing. Please log in again.");
+                    return;
+                }
+
                 chrome.runtime.sendMessage(
                     {
                         action: "saveCredentials",
                         site: siteName,
                         email,
-                        password: encryptedPassword, // Use encrypted password
+                        password: encryptedPassword,
                         token,
                     },
                     (response) => {
+                        if (chrome.runtime.lastError) {
+                            console.error(
+                                "Message sending error:",
+                                chrome.runtime.lastError
+                            );
+                            alert(
+                                "Failed to communicate with the extension background."
+                            );
+                            return;
+                        }
+
                         if (response && response.success) {
                             alert("Credentials saved successfully!");
-                            // Navigate back to Saved Passwords
                             document.getElementById(
                                 "newPasswordPage"
                             ).style.display = "none";
@@ -67,14 +117,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "block";
                         } else {
                             alert(
-                                "Failed to save credentials: " + response.error
+                                "Failed to save credentials: " +
+                                    (response?.error || "Unknown error")
                             );
                         }
                     }
                 );
             } catch (error) {
-                console.error("Encryption failed:", error);
-                alert("An error occurred while encrypting the password.");
+                console.error("Error during credential saving:", error);
+                alert("An unexpected error occurred.");
             }
         });
 });
