@@ -70,3 +70,28 @@ button {
 button:hover {
     background: darkred;
 }
+
+/* Search Bar and New Button */
+.search-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-container input {
+    flex: 1;
+}
+
+.search-container button {
+    background: green;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.search-container button:hover {
+    background: darkgreen;
+}

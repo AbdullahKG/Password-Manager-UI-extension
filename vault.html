@@ -8,6 +8,7 @@
         <script type="module" defer src="vault.js"></script>
         <script type="module" defer src="randomPassword.js"></script>
         <script type="module" defer src="CheckPassword.js"></script>
+        <script type="module" defer src="addNewPassword.js"></script>
     </head>
     <body>
         <nav class="navbar">
@@ -19,11 +20,14 @@
         <div id="passwords" class="page">
             <div class="password-manager">
                 <h2>Saved Passwords</h2>
-                <input
-                    type="text"
-                    id="searchInput"
-                    placeholder="Search by site name..."
-                />
+                <div class="search-container">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search by site name..."
+                    />
+                    <button id="newPasswordBtn">New</button>
+                </div>
                 <div id="passwordList" class="password-list"></div>
             </div>
         </div>
@@ -46,6 +50,20 @@
                 />
                 <button id="checkBtn">Check</button>
                 <p id="checkResult"></p>
+            </div>
+        </div>
+
+        <div id="newPasswordPage" class="page" style="display: none">
+            <div class="password-manager">
+                <h2>Add New Password</h2>
+                <input
+                    type="text"
+                    id="siteName"
+                    placeholder="Site Name ex: github.com"
+                />
+                <input type="email" id="email" placeholder="Email" />
+                <input type="password" id="password" placeholder="Password" />
+                <button id="createNewBtn">Create New</button>
             </div>
         </div>
     </body>
