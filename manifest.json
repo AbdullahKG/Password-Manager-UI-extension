@@ -4,8 +4,8 @@
     "version": "1.0",
     "description": "A self-hosted password manager extension.",
     "icons": {
-        "48": "./images/shield.png",
-        "128": "./images/shield.png"
+        "48": "./shield.png",
+        "128": "./shield.png"
     },
     "permissions": [
         "storage",
