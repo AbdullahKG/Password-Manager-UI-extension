@@ -34,28 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function isLoginPage() {
-        const emailSelectors = [
-            'input[type="email"]',
-            'input[type="text"][name*="email" i]',
-            'input[type="text"][id*="email" i]',
-            'input[type="text"][class*="email" i]',
-            'input[placeholder*="email" i]',
-            'input[aria-label*="email" i]',
-            'input[type="text"][name*="user" i]',
-            'input[type="text"][id*="user" i]',
-            'input[type="text"][class*="user" i]',
-            'input[placeholder*="username" i]',
-            'input[aria-label*="username" i]',
-        ];
+        const emailSelectors = ['input[type="email"]', 'input[type="text"]'];
 
-        const passwordSelectors = [
-            'input[type="password"]',
-            'input[type="text"][name*="password" i]',
-            'input[type="text"][id*="password" i]',
-            'input[type="text"][class*="password" i]',
-            'input[placeholder*="password" i]',
-            'input[aria-label*="password" i]',
-        ];
+        const passwordSelectors = ['input[type="password"]'];
 
         const hasEmail = emailSelectors.some((selector) =>
             document.querySelector(selector)
