@@ -60,8 +60,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const loginButtonSelectors = [
                 'input[type="submit"]',
                 'input[value="Sign in"]',
+                'input[value="Sign In"]',
                 'input[value="Log In"]',
                 'input[value="Login"]',
+                'input[value="Singin"]',
             ];
 
             const hasEmail = emailSelectors.some((selector) =>
