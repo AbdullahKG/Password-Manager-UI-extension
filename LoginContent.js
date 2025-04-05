@@ -70,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.querySelector(selector)
             );
 
-            // Check if there are any login or signin buttons on the page
             const hasLoginButton = loginButtonSelectors.some((selector) =>
                 document.querySelector(selector)
             );
