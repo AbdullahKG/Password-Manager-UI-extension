@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const { usernameField, emailField, passwordField } =
                     detectSignupForm();
 
-                if (!emailField || !passwordField) {
+                if (!emailField || !passwordField || !usernameField) {
                     console.warn(
                         "Signup form fields not detected. Popup setup aborted."
                     );

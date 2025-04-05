@@ -57,6 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
             ];
             const passwordSelectors = ['input[type="password"]'];
 
+            const loginButtonSelectors = [
+                'input[type="submit"]',
+                'input[value="Sign in"]',
+                'input[value="Login"]',
+            ];
+
             const hasEmail = emailSelectors.some((selector) =>
                 document.querySelector(selector)
             );
@@ -64,11 +70,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.querySelector(selector)
             );
 
+            // Check if there are any login or signin buttons on the page
+            const hasLoginButton = loginButtonSelectors.some((selector) =>
+                document.querySelector(selector)
+            );
+
             console.log(
                 "Checking if current page is a login page:",
-                hasEmail && hasPassword ? "Yes" : "No"
+                hasEmail && hasPassword && hasLoginButton ? "Yes" : "No"
             );
-            return hasEmail && hasPassword;
+            return hasEmail && hasPassword && hasLoginButton;
         } catch (error) {
             console.error("Error checking login page:", error);
             return false;
