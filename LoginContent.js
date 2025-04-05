@@ -51,38 +51,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function isLoginPage() {
         try {
-            const emailSelectors = [
-                'input[type="email"]',
-                'input[type="text"]',
-            ];
-            const passwordSelectors = ['input[type="password"]'];
+            const links = document.querySelectorAll("a");
+            const resetLinks = Array.from(links).filter((link) => {
+                const text = link.innerText.toLowerCase();
+                const href = link.href.toLowerCase();
 
-            const loginButtonSelectors = [
-                'button[value="Sign in"]',
-                'button[value="Sign In"]',
-                'button[value="Log In"]',
-                'button[value="Login"]',
-                'button[value="Singin"]',
-                'button[name="commit"]',
-                'input[name="commit"]',
-            ];
-
-            const hasEmail = emailSelectors.some((selector) =>
-                document.querySelector(selector)
-            );
-            const hasPassword = passwordSelectors.some((selector) =>
-                document.querySelector(selector)
-            );
-
-            const hasLoginButton = loginButtonSelectors.some((selector) =>
-                document.querySelector(selector)
-            );
+                return (
+                    text.includes("forgot your password?") ||
+                    text.includes("forget your password?") ||
+                    text.includes("reset your password?") ||
+                    text.includes("forgot password?") ||
+                    text.includes("forget password?") ||
+                    text.includes("reset password?") ||
+                    text.includes("recover your password") ||
+                    href.includes("forgot") ||
+                    href.includes("forget") ||
+                    href.includes("reset") ||
+                    href.includes("recover")
+                );
+            });
 
             console.log(
                 "Checking if current page is a login page:",
-                hasEmail && hasPassword && hasLoginButton ? "Yes" : "No"
+                resetLinks.length > 0 ? "Yes" : "No"
             );
-            return hasEmail && hasPassword && hasLoginButton;
+            console.log(resetLinks);
+            return resetLinks.length > 0;
         } catch (error) {
             console.error("Error checking login page:", error);
             return false;
