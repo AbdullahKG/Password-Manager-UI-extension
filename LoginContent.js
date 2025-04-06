@@ -262,12 +262,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const emailFields = document.querySelectorAll(
                 'input[type="email"], input[type="text"]'
             );
-            const storedEmails = await fetchStoredEmails();
 
             emailFields.forEach((inputField) => {
-                inputField.addEventListener("click", (event) => {
+                inputField.addEventListener("click", async (event) => {
                     console.log("Input field clicked:", inputField);
                     event.stopPropagation();
+                    const storedEmails = await fetchStoredEmails();
                     createPopup(inputField, storedEmails);
                 });
             });
