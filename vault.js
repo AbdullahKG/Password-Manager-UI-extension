@@ -88,12 +88,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 div.classList.add("password-item");
 
                 div.innerHTML = `
-                    <div>
-                        <strong>${item.siteName}</strong> <br>
-                        <span class="site-email">${item.siteEmail}</span> <br>
-                        <span class="decrypted-password">${decryptedPassword}</span>
-                    </div>
-                    <button class="delete-btn" data-id="${item.siteName}">Delete</button>`;
+                                <div>
+                                    <strong>${item.siteName}</strong> <br>
+                                    <span class="site-email">${item.siteEmail}</span> <br>
+                                    <input 
+                                        type="password" 
+                                        class="decrypted-password" 
+                                        value="${decryptedPassword}" 
+                                        readonly 
+                                        onfocus="this.select()"
+                                    />
+                                </div>
+                                <button class="toggle-visibility-btn">Show</button>
+                                <button class="delete-btn" data-id="${item.siteName}">Delete</button>
+                                
+                                `;
 
                 passwordList.appendChild(div);
             } catch (error) {
@@ -124,6 +133,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 deletePassword(siteName, siteEmail);
             });
         });
+
+        document
+            .querySelectorAll(".toggle-visibility-btn")
+            .forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    const parentDiv = event.target.closest(".password-item");
+                    const passwordInput = parentDiv.querySelector(
+                        ".decrypted-password"
+                    );
+
+                    if (passwordInput.type === "password") {
+                        passwordInput.type = "text";
+                        button.innerText = "Hide";
+                    } else {
+                        passwordInput.type = "password";
+                        button.innerText = "Show";
+                    }
+                });
+            });
 
         // Search functionality
         searchInput.addEventListener("input", (e) => {

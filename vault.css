@@ -71,6 +71,14 @@ button:hover {
     background: darkred;
 }
 
+.toggle-visibility-btn {
+    background: green;
+}
+
+.toggle-visibility-btn:hover {
+    background: darkgreen;
+}
+
 /* Search Bar and New Button */
 .search-container {
     display: flex;
@@ -94,4 +102,21 @@ button:hover {
 
 .search-container button:hover {
     background: darkgreen;
+}
+
+.decrypted-password {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 1rem;
+    color: inherit;
+    pointer-events: auto;
+    width: auto;
+    text-align: center;
+    height: 0px;
+}
+
+.decrypted-password:focus {
+    outline: none;
+    background: #f0f0f0;
 }
