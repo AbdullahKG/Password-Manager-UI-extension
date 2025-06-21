@@ -78,6 +78,45 @@ runtime.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     success: true,
                     message: "Credentials saved successfully.",
                 });
+            } else if (request.action === "updateCredentials") {
+                if (
+                    !request.token ||
+                    !request.site ||
+                    !request.email ||
+                    !request.password
+                ) {
+                    throw new Error(
+                        "Missing required parameters for updateCredentials."
+                    );
+                }
+
+                const response = await fetch(
+                    "http://localhost:3000/passwords",
+                    {
+                        method: "PATCH",
+                        headers: {
+                            Authorization: `Bearer ${request.token}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            siteName: request.site,
+                            siteEmail: request.email,
+                            newPassword: request.password,
+                        }),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Server error: ${response.status} ${response.statusText}`
+                    );
+                }
+
+                await response.json();
+                sendResponse({
+                    success: true,
+                    message: "Credentials updated successfully.",
+                });
             } else {
                 throw new Error("Unknown action.");
             }
